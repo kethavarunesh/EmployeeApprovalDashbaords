@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Employees Data</title>
+   
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mt-4">Employee Reports</h1>
+
+        {% if documents %}
+        <div class="mt-4">
+            <h1 class="mt-4">Screen 2</h1>
+            <h2>Employee and Document Details</h2>
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Emp Code</th>
+                        <th>Document No</th>
+                        <th>Project</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                     
+                        <th>Remarks</th>
+                      
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for document in documents %}
+                    <tr>
+                        <td>{{ document.empcode }}</td>
+                        <td>{{ document.document_no }}</td>
+                        <td>{{ document.project_name }}</td>
+                        <td>{{ document.date }}</td>
+                        <td>{{ document.status_text }}</td>
+                       
+                        <td>{{ document.remarks }}</td>
+                       
+                        <td>
+                            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#details_{{ document.id }}">View</button>
+                            {% if document.status == 3 or document.status == 33 or document.status == 333 or document.status == 3333 %}
+                            <button type="button" class="btn btn-info edit-btn" data-document-id="{{ document.id }}">Edit</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr id="details_{{ document.id }}" class="collapse">
+                        <td colspan="6">
+                            <h3>Document Details</h3>
+                            <p><strong>Document No:</strong> {{ document.document_no }}</p>
+                            <p><strong>Project:</strong> {{ document.project_name }}</p>
+                            <p><strong>Order Serial No:</strong> {{ document.order_serial_no }}</p>
+                            <p><strong>Department:</strong> {{ document.department }}</p>
+                            <p><strong>Material Code:</strong> {{ document.material_code }}</p>
+                            <p><strong>Material Description:</strong> {{ document.material_description }}</p>
+                            <p><strong>Supplier Name:</strong> {{ document.supplier_name }}</p>
+                            <p><strong>Quantity:</strong> {{ document.qty }}</p>
+                            <p><strong>Value:</strong> {{ document.value }}</p>
+                            <p><strong>Rejection Reason:</strong> {{ document.rejection_reason }}</p>
+                            <p><strong>Reason for Rejection:</strong> {{ document.reason_for_rejection }}</p>
+                            <p><strong>File:</strong> <a href="{{ document.file_upload.url }}" download>{{ document.file_upload }}</a></p>
+                            <p><strong>Man Hours Wasted:</strong> {{ document.man_hours_wasted }}</p>
+                            <p><strong>Machine Hours Wasted:</strong> {{ document.machine_hours_wasted }}</p>
+                            <p><strong>Information to Buyer:</strong> {{ document.information_to_buyer }}</p>
+                           
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-warning" role="alert">
+            No documents found for the employee.
+        </div>
+        {% endif %}
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.edit-btn').click(function() {
+                let documentId = $(this).data('document-id');
+                window.location.href = `/edit_document/${documentId}/`;
+            });
+        });
+    </script>
+</body>
+</html>
