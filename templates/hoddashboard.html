@@ -11,6 +11,16 @@
     <div class="container mt-4">
         <h1 class="mt-4">Screen 3</h1>
         <h3 class="mb-4">HOD Dashboard</h3>
+        {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        {% endfor %}
+      {% endif %}
         {% if documents %}
         <div class="mt-4">
             <h2>Employee and Document Details</h2>
@@ -95,6 +105,7 @@
                     success: function(response) {
                         if (response && response.success) {
                             console.log('Removing row for document ID:', documentId);
+                            $('#message-container').html(`<div class="alert alert-success alert-dismissible fade show" role="alert">Employee document approved successfully.</div>`);
                             $('#details_' + documentId).prev('tr').remove();
                             $('#details_' + documentId).remove();
                         } else {
@@ -115,8 +126,10 @@
                     success: function(response) {
                         if (response && response.success) {
                             console.log('Removing row for document ID:', documentId);
+                            $('#message-container').html(`<div class="alert alert-success alert-dismissible fade show" role="alert">Employee document rejected successfully.</div>`);
                             $('#details_' + documentId).prev('tr').remove();
                             $('#details_' + documentId).remove();
+                             
                         } else {
                             console.error('Error updating status or invalid response format');
                         }

@@ -1,6 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import  Mtplnew_dataentry
 from django.http import JsonResponse
+from django.contrib import messages
+
+def homepage(request):
+
+    return render(request,'Home.html')
 
 def create_document(request):
     if request.method == 'POST':
@@ -22,30 +27,62 @@ def create_document(request):
         machine_hours_wasted = request.POST.get('machine_hours_wasted')
         information_to_buyer = request.POST.get('information_to_buyer')
 
-       
         Mtplnew_dataentry.objects.create(
-                    empcode=empcode,
-                    project_name=project_name,
-                    date=date,
-                    document_no=document_no,
-                    order_serial_no=order_serial_no,
-                    department=department,
-                    material_code=material_code,
-                    material_description=material_description,
-                    supplier_name=supplier_name,
-                    qty=qty,
-                    value=value,
-                    rejection_reason=rejection_reason,
-                    reason_for_rejection=reason_for_rejection,
-                    file_upload=file_upload,
-                    man_hours_wasted=man_hours_wasted,
-                    machine_hours_wasted=machine_hours_wasted,
-                    information_to_buyer=information_to_buyer
-                )
+            empcode=empcode,
+            project_name=project_name,
+            date=date,
+            document_no=document_no,
+            order_serial_no=order_serial_no,
+            department=department,
+            material_code=material_code,
+            material_description=material_description,
+            supplier_name=supplier_name,
+            qty=qty,
+            value=value,
+            rejection_reason=rejection_reason,
+            reason_for_rejection=reason_for_rejection,
+            file_upload=file_upload,
+            man_hours_wasted=man_hours_wasted,
+            machine_hours_wasted=machine_hours_wasted,
+            information_to_buyer=information_to_buyer
+        )
+
+        messages.success(request, 'Data saved successfully.')
+
+        return redirect('/')
         
-        return redirect('reports')
-    
     return render(request, 'Entrypage.html')
+
+def specific_empfilter(request):
+    empcode = '909454' 
+    
+    documents = Mtplnew_dataentry.objects.filter(empcode=empcode)
+    
+    for document in documents:
+        if document.status == 0:
+            document.status_text = 'Pending'
+        elif document.status == 1:
+            document.status_text = 'Pending at PQA HOD'
+        elif document.status == 3:
+            document.status_text = 'Rejected by HOD'
+        elif document.status == 11:
+            document.status_text = 'Approved by PQA'
+        elif document.status == 33:
+            document.status_text = 'Rejected by PQA HOD'
+        elif document.status == 111:
+            document.status_text = 'Approved by Purchase'
+        elif document.status == 333:
+            document.status_text = 'Rejected by Purchase'
+        elif document.status == 1111:
+            document.status_text = 'Approved by Plant Head'
+        elif document.status == 3333:
+            document.status_text = 'Rejected by Plant Head'
+        else:
+            document.status_text = 'Other Status'
+    context = {
+        'documents': documents,
+    }
+    return render(request, 'specificemployee.html', context)
 
 def employee_reports(request):
    
@@ -108,19 +145,26 @@ def edit_document(request, document_id):
 
 def hoddashbaord(request):
     documents = Mtplnew_dataentry.objects.filter(status=0) 
+    
     return render(request, 'hoddashboard.html', {'documents': documents})
+
+
 
 def hod_approve_document(request, document_id):
     document = get_object_or_404(Mtplnew_dataentry, pk=document_id)
     document.status = 1 
     document.save()
-    return JsonResponse({'success': True})
     
+    messages.success(request, f'Employee {document.empcode} document approved successfully.')
+    return JsonResponse({'success': True})
 
+    
+    
 def hod_reject_document(request, document_id):
     document = get_object_or_404(Mtplnew_dataentry, pk=document_id)
     document.status = 3 
     document.save()
+    messages.success(request, f'Employee {document.empcode} document rejected successfully.')
     return JsonResponse({'success': True})
    
    
@@ -148,12 +192,9 @@ def pqa_reject_document(request, document_id):
     document.save()
     return JsonResponse({'success': True})
 
-
-
 def purchasehod_dashboard(request):
-    employees = Mtplnew_dataentry.objects.values('empcode').distinct()
     documents = Mtplnew_dataentry.objects.filter(status=11) 
-    return render(request, 'purchase_hod.html', {'employees': employees,'documents': documents})
+    return render(request, 'purchase_hod.html', {'documents': documents})
 
 
 def purchase_approve_document(request, document_id):
@@ -180,9 +221,9 @@ def purchase_reject_document(request, document_id):
    
 
 def planthead(request):
-    employees = Mtplnew_dataentry.objects.values('empcode').distinct()
+  
     documents = Mtplnew_dataentry.objects.filter(status=111) 
-    return render(request, 'planthod.html', {'employees': employees,'documents': documents})   
+    return render(request, 'planthod.html', {'documents': documents})   
    
 def planthead_approve_document(request, document_id):
     document = get_object_or_404(Mtplnew_dataentry, id=document_id)

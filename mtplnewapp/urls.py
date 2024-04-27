@@ -5,7 +5,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.create_document, name='create_document'),
+    path('',views.homepage,name='homepage'),
+    path('create_document/', views.create_document, name='create_document'),
+    path('specific_empfilter/', views.specific_empfilter, name='specific_empfilter'),
     path('employee/reports/', views.employee_reports, name='employee_reports'),
     path('hoddashboard/', views.hoddashbaord, name='hoddashbaord'),
     path('approve_document/<int:document_id>/', views.hod_approve_document, name='hod_approve_document'),
