@@ -18,30 +18,27 @@
             <table class="table table-bordered">
                 <thead class="thead-dark">
                     <tr>
+                        <th>S.No</th>
                         <th>Emp Code</th>
                         <th>Document No</th>
                         <th>Project</th>
                         <th>Date</th>
                         <th>Status</th>
-                     
-                        <th>Remarks</th>
-                      
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for document in documents %}
+                    {% for  document in documents %}
                     <tr>
+                        <td class="serial-number"></td>
                         <td>{{ document.empcode }}</td>
                         <td>{{ document.document_no }}</td>
                         <td>{{ document.project_name }}</td>
                         <td>{{ document.date }}</td>
                         <td>{{ document.status_text }}</td>
-                       
-                        <td>{{ document.remarks }}</td>
-                       
                         <td>
-                            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#details_{{ document.id }}">View</button>
+                            <button type="button" class="btn btn-primary view-btn" data-toggle="collapse" data-target="#details_{{ document.id }}">View</button>
+                            <button type="button" class="btn btn-secondary close-details-btn d-none" data-document-id="{{ document.id }}">Close</button>
                             {% if document.status == 3 or document.status == 33 or document.status == 333 or document.status == 3333 %}
                             <button type="button" class="btn btn-info edit-btn" data-document-id="{{ document.id }}">Edit</button>
                             {% endif %}
@@ -65,7 +62,16 @@
                             <p><strong>Man Hours Wasted:</strong> {{ document.man_hours_wasted }}</p>
                             <p><strong>Machine Hours Wasted:</strong> {{ document.machine_hours_wasted }}</p>
                             <p><strong>Information to Buyer:</strong> {{ document.information_to_buyer }}</p>
-                           
+                            {% if document.approval_comment %}
+                            <p><strong>PQA Approval Comment:</strong> {{ document.approval_comment }}</p>
+                            {% endif %}
+                            {% if document.purchase_remarks %}
+                            <p><strong>Purchase remarks:</strong> {{ document.purchase_remarks }}</p>
+                            {% endif %}
+                            {% if document.planthod_remarks %}
+                            <p><strong>Plant Hod remarks:</strong> {{ document.planthod_remarks }}</p>
+                            {% endif %}
+            
                         </td>
                     </tr>
                     {% endfor %}
@@ -84,10 +90,41 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+        
         $(document).ready(function() {
+            function updateSerialNumbers() {
+                let serialNumber = 1;
+                $('.serial-number').each(function() {
+                    $(this).text(serialNumber++);
+                });
+            }
+
+           
+            updateSerialNumbers();
+
+          
+            function handleRowRemoval(documentId) {
+                console.log('Removing row for document ID:', documentId);
+                $('#details_' + documentId).prev('tr').remove();
+                $('#details_' + documentId).remove();
+                updateSerialNumbers(); 
+            }
             $('.edit-btn').click(function() {
                 let documentId = $(this).data('document-id');
                 window.location.href = `/edit_document/${documentId}/`;
+            });
+            $('.view-btn').click(function() {
+                $('.close-details-btn').addClass('d-none');
+                $(this).closest('tr').find('.close-details-btn').removeClass('d-none'); 
+            });
+            $('.collapse').on('shown.bs.collapse', function () {
+                $(this).closest('tr').find('.close-details-btn').removeClass('d-none'); 
+            });
+            $('.close-details-btn').click(function() {
+                let documentId = $(this).data('document-id');
+                $(this).addClass('d-none');
+                $('#details_' + documentId).collapse('hide');
+                
             });
         });
     </script>

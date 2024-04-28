@@ -14,7 +14,6 @@
 
         {% if documents %}
         <div class="mt-4">
-            
             <table class="table table-bordered">
                 <thead class="thead-dark">
                     <tr>
@@ -23,9 +22,6 @@
                         <th>Project</th>
                         <th>Date</th>
                         <th>Status</th>
-                     
-                        <th>Remarks</th>
-                      
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -37,9 +33,6 @@
                         <td>{{ document.project_name }}</td>
                         <td>{{ document.date }}</td>
                         <td>{{ document.status_text }}</td>
-                       
-                        <td>{{ document.remarks }}</td>
-                       
                         <td>
                             <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#details_{{ document.id }}">View</button>
                             {% if document.status == 3 or document.status == 33 or document.status == 333 or document.status == 3333 %}
@@ -65,7 +58,12 @@
                             <p><strong>Man Hours Wasted:</strong> {{ document.man_hours_wasted }}</p>
                             <p><strong>Machine Hours Wasted:</strong> {{ document.machine_hours_wasted }}</p>
                             <p><strong>Information to Buyer:</strong> {{ document.information_to_buyer }}</p>
-                           
+                           {% if document.purchase_remarks %}
+                           <p><strong>Purchase remarks:</strong> {{ document.purchase_remarks }}</p>
+                           {% endif %}
+                           {% if document.planthod_remarks %}
+                           <p><strong>Plant Hod remarks:</strong> {{ document.planthod_remarks }}</p>
+                           {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -85,6 +83,23 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function() {
+            function updateSerialNumbers() {
+                let serialNumber = 1;
+                $('.serial-number').each(function() {
+                    $(this).text(serialNumber++);
+                });
+            }
+
+           
+            updateSerialNumbers();
+
+          
+            function handleRowRemoval(documentId) {
+                console.log('Removing row for document ID:', documentId);
+                $('#details_' + documentId).prev('tr').remove();
+                $('#details_' + documentId).remove();
+                updateSerialNumbers(); 
+            }
             $('.edit-btn').click(function() {
                 let documentId = $(this).data('document-id');
                 window.location.href = `/edit_document/${documentId}/`;

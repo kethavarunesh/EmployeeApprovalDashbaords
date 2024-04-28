@@ -26,8 +26,8 @@ class Mtplnew_dataentry(models.Model):
     status = models.IntegerField(default=0)  
     approval_comment = models.CharField(max_length=100)
     ncraised = models.CharField(max_length=10, choices=NC_CHOICES)
-    remarks=models.CharField(max_length=100)
-
+    purchase_remarks=models.CharField(max_length=100)
+    planthod_remarks=models.CharField(max_length=100)
     def __str__(self):
         return self.document_no
 

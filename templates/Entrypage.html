@@ -10,16 +10,30 @@
       integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
       crossorigin="anonymous"
     />
+    
   </head>
 
   <body>
+
+
     <form method="POST" enctype="multipart/form-data" >
       {% csrf_token %}
-
+    
      <div class="container mt-5">
         <h1 class="mt-4">Screen 1</h1>
         <h1 class="mt-4">Employee Entry Page</h1>
-
+        {% if messages %}
+        {% for message in messages %}
+          <div class="container">
+            <div class="row">
+              <div class="col"><div class="alert alert-success alert-dismissible fade show " role="alert">
+                {{ message }}
+              </div></div>
+              <div class="col"></div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
         <div class="row">
             <div class="col"> <div class="form-group">
                 <label for="empcode">Employee Code:</label>

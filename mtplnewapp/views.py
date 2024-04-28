@@ -49,18 +49,18 @@ def create_document(request):
 
         messages.success(request, 'Data saved successfully.')
 
-        return redirect('/')
+        return redirect('create_document')
         
     return render(request, 'Entrypage.html')
 
 def specific_empfilter(request):
-    empcode = '784528' 
+    empcode = '987456' 
     
     documents = Mtplnew_dataentry.objects.filter(empcode=empcode)
     
     for document in documents:
         if document.status == 0:
-            document.status_text = 'Pending'
+            document.status_text = 'Pending at Hod'
         elif document.status == 1:
             document.status_text = 'Pending at PQA HOD'
         elif document.status == 3:
@@ -134,44 +134,36 @@ def edit_document(request, document_id):
         document.machine_hours_wasted = request.POST.get('machine_hours_wasted')
         document.information_to_buyer = request.POST.get('information_to_buyer')
         document.status = 0
-        document.remarks=""
+        document.planthod_remarks=""
+        document.purchase_remarks=""
         document.approval_comment=""
         document.ncraised=""
         document.save()
-        
-        return redirect('employee_reports')  
+        messages.success(request, 'Data updated successfully.')
+        return redirect('edit_document', document_id=document.id) 
 
     return render(request, 'edit.html', {'document': document})
 
 def hoddashbaord(request):
     documents = Mtplnew_dataentry.objects.filter(status=0) 
-    
     return render(request, 'hoddashboard.html', {'documents': documents})
-
-
 
 def hod_approve_document(request, document_id):
     document = get_object_or_404(Mtplnew_dataentry, pk=document_id)
     document.status = 1 
     document.save()
-    
-    messages.success(request, f'Employee {document.empcode} document approved successfully.')
     return JsonResponse({'success': True})
 
-    
-    
 def hod_reject_document(request, document_id):
     document = get_object_or_404(Mtplnew_dataentry, pk=document_id)
     document.status = 3 
     document.save()
-    messages.success(request, f'Employee {document.empcode} document rejected successfully.')
     return JsonResponse({'success': True})
    
    
 def pqa_dashboard(request):
-    employees = Mtplnew_dataentry.objects.values('empcode').distinct()
     documents = Mtplnew_dataentry.objects.filter(status=1) 
-    return render(request, 'pqa_dashboard.html', {'employees': employees,'documents': documents})
+    return render(request, 'pqa_dashboard.html', {'documents': documents})
 
 def pqa_approve_document(request, document_id):
     if request.method =="POST":
@@ -200,26 +192,24 @@ def purchasehod_dashboard(request):
 def purchase_approve_document(request, document_id):
    if request.method =="POST":
      document = get_object_or_404(Mtplnew_dataentry, id=document_id)
-     remarks = request.POST.get('remarks')
-     print(remarks)
+     purchase_remarks = request.POST.get('remarks')
+     print(purchase_remarks)
      document.status = 111
-     document.remarks = remarks
+     document.purchase_remarks = purchase_remarks
      document.save()
      return JsonResponse({'success': True})
-
 
 
 def purchase_reject_document(request, document_id):
    if request.method =="POST":
      document = get_object_or_404(Mtplnew_dataentry, id=document_id)
-     remarks1 = request.POST.get('remarks1')
-     print(remarks1)
+     purchase_remarks = request.POST.get('remarks1')
+     print(purchase_remarks)
      document.status = 333
-     document.remarks = remarks1
+     document.purchase_remarks = purchase_remarks
      document.save()
      return JsonResponse({'success': True})
    
-
 def planthead(request):
   
     documents = Mtplnew_dataentry.objects.filter(status=111) 
@@ -227,19 +217,19 @@ def planthead(request):
    
 def planthead_approve_document(request, document_id):
     document = get_object_or_404(Mtplnew_dataentry, id=document_id)
-    remarks = request.POST.get('remarks')
-    print(remarks)
+    planthod_remarks = request.POST.get('remarks')
+    print(planthod_remarks)
     document.status = 1111 
-    document.remarks = remarks
+    document.planthod_remarks = planthod_remarks
     document.save()
     return JsonResponse({'success': True}) 
 
 def planthead_reject_document(request, document_id):
     document = get_object_or_404(Mtplnew_dataentry, id=document_id)
-    remarks1 = request.POST.get('remarks1')
-    print(remarks1)
+    planthod_remarks = request.POST.get('remarks1')
+    print(planthod_remarks)
     document.status = 3333
-    document.remarks = remarks1
+    document.planthod_remarks = planthod_remarks
     document.save()
     return JsonResponse({'success': True}) 
 

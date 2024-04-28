@@ -25,6 +25,7 @@
             <table class="table table-bordered">
                 <thead class="thead-dark">
                     <tr>
+                        <th>S.No</th>
                         <th>Emp Code</th>
                         <th>Document No</th>
                         <th>Project</th>
@@ -37,6 +38,7 @@
                 <tbody>
                     {% for document in documents %}
                     <tr> 
+                        <td class="serial-number"></td>
                             <td>{{ document.empcode }}</td>
                         
                         <td>{{ document.document_no }}</td>
@@ -44,7 +46,8 @@
                         <td>{{ document.date }}</td>
                                      
                         <td>
-                            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#details_{{ document.id }}">View</button>
+                            <button type="button" class="btn btn-primary view-btn" data-toggle="collapse" data-target="#details_{{ document.id }}">View</button>
+                            <button type="button" class="btn btn-secondary close-details-btn d-none" data-document-id="{{ document.id }}">Close</button>
                         </td>
                         <td>
                             <button class="btn btn-success approve-btn" data-document-id="{{ document.id }}" >Approve</button>
@@ -91,6 +94,26 @@
     
     <script>
         $(document).ready(function() {
+
+            function updateSerialNumbers() {
+                let serialNumber = 1;
+                $('.serial-number').each(function() {
+                    $(this).text(serialNumber++);
+                });
+            }
+
+           
+            updateSerialNumbers();
+
+          
+            function handleRowRemoval(documentId) {
+                console.log('Removing row for document ID:', documentId);
+                $('#details_' + documentId).prev('tr').remove();
+                $('#details_' + documentId).remove();
+                updateSerialNumbers(); 
+            }
+            
+
             $('.approve-btn').click(function() {
                 let documentId = $(this).data('document-id');
                 $.ajax({
@@ -102,10 +125,7 @@
                     },
                     success: function(response) {
                         if (response && response.success) {
-                            console.log('Removing row for document ID:', documentId);
-                            $('#message-container').html(`<div class="alert alert-success alert-dismissible fade show" role="alert">Employee document approved successfully.</div>`);
-                            $('#details_' + documentId).prev('tr').remove();
-                            $('#details_' + documentId).remove();
+                            handleRowRemoval(documentId);
                         } else {
                             console.error('Error updating status or invalid response format');
                         }
@@ -123,17 +143,27 @@
                     },
                     success: function(response) {
                         if (response && response.success) {
-                            console.log('Removing row for document ID:', documentId);
-                            $('#message-container').html(`<div class="alert alert-success alert-dismissible fade show" role="alert">Employee document rejected successfully.</div>`);
-                            $('#details_' + documentId).prev('tr').remove();
-                            $('#details_' + documentId).remove();
-                             
+                            handleRowRemoval(documentId);
                         } else {
                             console.error('Error updating status or invalid response format');
                         }
                     },
                 });
             });
+            $('.view-btn').click(function() {
+                $('.close-details-btn').addClass('d-none');
+                $(this).closest('tr').find('.close-details-btn').removeClass('d-none'); 
+            });
+            $('.collapse').on('shown.bs.collapse', function () {
+                $(this).closest('tr').find('.close-details-btn').removeClass('d-none'); 
+            });
+            $('.close-details-btn').click(function() {
+                let documentId = $(this).data('document-id');
+                $(this).addClass('d-none');
+                $('#details_' + documentId).collapse('hide');
+                
+            });
+           
         });
     </script>
     

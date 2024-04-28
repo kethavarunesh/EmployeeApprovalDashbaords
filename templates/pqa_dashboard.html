@@ -19,6 +19,7 @@
         <table class="table table-bordered">
           <thead class="thead-dark">
             <tr>
+              <th>S.No</th>
               <th>Emp Code</th>
               <th>Document No</th>
               <th>Project</th>
@@ -30,20 +31,15 @@
           <tbody>
             {% for document in documents %}
             <tr>
+              <td class="serial-number"></td>
               <td>{{ document.empcode }}</td>
               <td>{{ document.document_no }}</td>
               <td>{{ document.project_name }}</td>
               <td>{{ document.date }}</td>
               <td>
-                <button
-                  type="button"
-                  class="btn btn-primary"
-                  data-toggle="collapse"
-                  data-target="#details_{{ document.id }}"
-                >
-                  View
-                </button>
-              </td>
+                <button type="button" class="btn btn-primary view-btn" data-toggle="collapse" data-target="#details_{{ document.id }}">View</button>
+                <button type="button" class="btn btn-secondary close-details-btn d-none" data-document-id="{{ document.id }}">Close</button>
+            </td>
               <td>
                 <button
                   class="btn btn-success approve-btn"
@@ -64,50 +60,21 @@
                 <h3>Document Details</h3>
                 <p><strong>Document No:</strong> {{ document.document_no }}</p>
                 <p><strong>Project:</strong> {{ document.project_name }}</p>
-                <p>
-                  <strong>Order Serial No:</strong> {{ document.order_serial_no
-                  }}
-                </p>
+                <p><strong>Order Serial No:</strong> {{ document.order_serial_no }}</p>
                 <p><strong>Department:</strong> {{ document.department }}</p>
-                <p>
-                  <strong>Material Code:</strong> {{ document.material_code }}
-                </p>
-                <p>
-                  <strong>Material Description:</strong> {{
-                  document.material_description }}
-                </p>
-                <p>
-                  <strong>Supplier Name:</strong> {{ document.supplier_name }}
-                </p>
+                <p><strong>Material Code:</strong> {{ document.material_code }}</p>
+                <p><strong>Material Description:</strong> {{ document.material_description }}</p>
+                <p><strong>Supplier Name:</strong> {{ document.supplier_name }}</p>
                 <p><strong>Quantity:</strong> {{ document.qty }}</p>
                 <p><strong>Value:</strong> {{ document.value }}</p>
-                <p>
-                  <strong>Rejection Reason:</strong> {{
-                  document.rejection_reason }}
-                </p>
-                <p>
-                  <strong>Reason for Rejection:</strong> {{
-                  document.reason_for_rejection }}
-                </p>
-                <p>
-                  <strong>File:</strong>
-                  <a href="{{ document.file_upload.url }}" download
-                    >{{ document.file_upload }}</a
-                  >
-                </p>
-                <p>
-                  <strong>Man Hours Wasted:</strong> {{
-                  document.man_hours_wasted }}
-                </p>
-                <p>
-                  <strong>Machine Hours Wasted:</strong> {{
-                  document.machine_hours_wasted }}
-                </p>
-                <p>
-                  <strong>Information to Buyer:</strong> {{
-                  document.information_to_buyer }}
-                </p>
-              </td>
+                <p><strong>Rejection Reason:</strong> {{ document.rejection_reason }}</p>
+                <p><strong>Reason for Rejection:</strong> {{ document.reason_for_rejection }}</p>
+                <p><strong>File:</strong> <a href="{{ document.file_upload.url }}" download>{{ document.file_upload }}</a></p>
+                <p><strong>Man Hours Wasted:</strong> {{ document.man_hours_wasted }}</p>
+                <p><strong>Machine Hours Wasted:</strong> {{ document.machine_hours_wasted }}</p>
+                <p><strong>Information to Buyer:</strong> {{ document.information_to_buyer }}</p>
+             
+            </td>
             </tr>
             
             {% endfor %}
@@ -160,6 +127,23 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script>
       $(document).ready(function () {
+        function updateSerialNumbers() {
+          let serialNumber = 1;
+          $('.serial-number').each(function() {
+              $(this).text(serialNumber++);
+          });
+      }
+
+     
+      updateSerialNumbers();
+
+    
+      function handleRowRemoval(documentId) {
+          console.log('Removing row for document ID:', documentId);
+          $('#details_' + documentId).prev('tr').remove();
+          $('#details_' + documentId).remove();
+          updateSerialNumbers(); 
+      }
         $('.approve-btn').click(function() {
             var documentId = $(this).data('document-id');
             $('#approvalModal_' + documentId).modal('show');
@@ -182,10 +166,9 @@
                 },
                 success: function(response) {
                     if (response && response.success) {
-                        console.log('Selected NC Raised:', ncRaised);
-                        $('#details_' + documentId).prev('tr').remove();
-                        $('#details_' + documentId).remove();
+                      handleRowRemoval(documentId);
                         $('#approvalModal_' + documentId).modal('hide');
+                        
                     } 
                 },
             });
@@ -202,15 +185,25 @@
             },
             success: function (response) {
               if (response && response.success) {
-                console.log("Removing row for document ID:", documentId);
-                $("#details_" + documentId)
-                  .prev("tr")
-                  .remove();
-                $("#details_" + documentId).remove();
+    
+                handleRowRemoval(documentId);
               }
             },
           });
         });
+        $('.view-btn').click(function() {
+          $('.close-details-btn').addClass('d-none');
+          $(this).closest('tr').find('.close-details-btn').removeClass('d-none'); 
+      });
+      $('.collapse').on('shown.bs.collapse', function () {
+          $(this).closest('tr').find('.close-details-btn').removeClass('d-none'); 
+      });
+      $('.close-details-btn').click(function() {
+          let documentId = $(this).data('document-id');
+          $(this).addClass('d-none');
+          $('#details_' + documentId).collapse('hide');
+          
+      });
       });
     </script>
   </body>
