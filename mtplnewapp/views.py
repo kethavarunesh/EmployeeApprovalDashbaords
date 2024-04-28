@@ -54,7 +54,7 @@ def create_document(request):
     return render(request, 'Entrypage.html')
 
 def specific_empfilter(request):
-    empcode = '909454' 
+    empcode = '784528' 
     
     documents = Mtplnew_dataentry.objects.filter(empcode=empcode)
     
@@ -212,10 +212,10 @@ def purchase_approve_document(request, document_id):
 def purchase_reject_document(request, document_id):
    if request.method =="POST":
      document = get_object_or_404(Mtplnew_dataentry, id=document_id)
-     remarks = request.POST.get('remarks')
-     print(remarks)
+     remarks1 = request.POST.get('remarks1')
+     print(remarks1)
      document.status = 333
-     document.remarks = remarks
+     document.remarks = remarks1
      document.save()
      return JsonResponse({'success': True})
    
@@ -236,10 +236,10 @@ def planthead_approve_document(request, document_id):
 
 def planthead_reject_document(request, document_id):
     document = get_object_or_404(Mtplnew_dataentry, id=document_id)
-    remarks = request.POST.get('remarks')
-    print(remarks)
+    remarks1 = request.POST.get('remarks1')
+    print(remarks1)
     document.status = 3333
-    document.remarks = remarks
+    document.remarks = remarks1
     document.save()
     return JsonResponse({'success': True}) 
 
